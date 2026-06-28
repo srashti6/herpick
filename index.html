@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HerPick — Curated women's fashion picks</title>
+<title>shreestore.online — Curated women's fashion picks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -294,13 +294,13 @@
         <path d="M47 62 Q50 65 53 62" stroke="#3D2B1F" stroke-width="1.3" fill="none" stroke-linecap="round"/>
       </svg>
     </div>
-    <div class="splash-logo">HerPick<span class="dot"></span></div>
+    <div class="splash-logo">shreestore.online<span class="dot"></span></div>
   </div>
 </div>
 
 <header>
   <div class="topbar">
-    <a href="#" class="logo">HerPick<span class="dot"></span></a>
+    <a href="#" class="logo">shreestore.online<span class="dot"></span></a>
     <nav class="categories" id="catNav">
       <a href="#dresses" class="active">Dresses</a>
       <a href="#ethnic">Ethnic wear</a>
@@ -599,7 +599,7 @@
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="logo">HerPick<span class="dot"></span></div>
+      <div class="logo">shreestore.online<span class="dot"></span></div>
       <p>Curated women's fashion picks. We may earn a commission on purchases made through links on this site, at no extra cost to you.</p>
     </div>
     <div class="footer-links">
@@ -618,7 +618,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    © 2026 HerPick. All rights reserved.
+    © 2026 shreestore.online. All rights reserved.
   </div>
 </footer>
 
@@ -664,9 +664,9 @@
   function applyTheme(theme){
     if(theme === 'dark'){ root.setAttribute('data-theme','dark'); }
     else { root.removeAttribute('data-theme'); }
-    localStorage.setItem('herpick-theme', theme);
+    localStorage.setItem('shreestore.online-theme', theme);
   }
-  applyTheme(localStorage.getItem('herpick-theme') || 'light');
+  applyTheme(localStorage.getItem('shreestore.online-theme') || 'light');
   themeToggle.addEventListener('click', () => {
     const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
     applyTheme(current === 'dark' ? 'light' : 'dark');
@@ -701,7 +701,7 @@
     greeting.textContent = 'Hi, ' + name;
     greeting.style.display = 'inline';
   }
-  const savedUser = localStorage.getItem('herpick-user');
+  const savedUser = localStorage.getItem('shreestore.online-user');
   if(savedUser) showGreeting(savedUser);
 
   loginBtn.addEventListener('click', () => loginOverlay.classList.add('open'));
@@ -711,7 +711,7 @@
   document.getElementById('loginForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('userName').value.trim() || 'there';
-    localStorage.setItem('herpick-user', name);
+    localStorage.setItem('shreestore.online-user', name);
     showGreeting(name);
     loginOverlay.classList.remove('open');
   });
@@ -723,10 +723,10 @@
   const cartCount = document.getElementById('cartCount');
   const cartItemsEl = document.getElementById('cartItems');
 
-  let cart = JSON.parse(localStorage.getItem('herpick-cart') || '[]');
+  let cart = JSON.parse(localStorage.getItem('shreestore.online-cart') || '[]');
 
   function saveCart(){
-    localStorage.setItem('herpick-cart', JSON.stringify(cart));
+    localStorage.setItem('shreestore.online-cart', JSON.stringify(cart));
     renderCart();
   }
 
@@ -781,7 +781,7 @@
     });
   });
 </script>
-<!-- ===== HERPICK MUSIC PLAYER ===== -->
+<!-- ===== shreestore.online MUSIC PLAYER ===== -->
 
 <div class="music-btn" id="musicOpen">🎵</div>
 
@@ -816,5 +816,8 @@
 
 <link rel="stylesheet" href="music-player.css">
 <script src="music-player.js"></script>
+<audio id="bgMusic" loop>
+    <source src="music/shreestore.online-theme.mp3" type="audio/mpeg">
+</audio>
 </body>
 </html>
