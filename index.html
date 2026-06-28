@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HerPick — Curated women's fashion picks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF3EC;
+    --surface:#FFFFFF;
+    --ink:#3D2B1F;
+    --ink-soft:#8C7361;
+    --gold:#DDBEA9;
+    --gold-deep:#CB997E;
+    --maroon:#A5733F;
+    --line:#ECDFD2;
+    --radius:14px;
+  }
+  :root[data-theme="dark"]{
+    --cream:#1E1A16;
+    --surface:#2A2420;
+    --ink:#F3EAE2;
+    --ink-soft:#B8A998;
+    --gold:#DDBEA9;
+    --gold-deep:#E0A87A;
+    --maroon:#E0A87A;
+    --line:#3A322B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Jost', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+    transition:background .3s, color .3s;
+  }
+
+  #splash{
+    position:fixed; inset:0; background:var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    z-index:999; transition:opacity .6s ease, visibility .6s ease;
+  }
+  #splash .splash-bunny{
+    margin-bottom:6px;
+    opacity:0;
+    animation:bunnyHop 1.3s ease-out forwards;
+  }
+  #splash .splash-bunny svg{width:56px; height:56px; display:block; margin:0 auto;}
+  @keyframes bunnyHop{
+    0%{opacity:0; transform:translateY(-130px) scale(0.8);}
+    40%{opacity:1; transform:translateY(0) scale(1.05);}
+    55%{transform:translateY(-18px) scale(1);}
+    70%{transform:translateY(0) scale(1.04);}
+    82%{transform:translateY(-8px) scale(1);}
+    92%{transform:translateY(0) scale(1.02);}
+    100%{transform:translateY(0) scale(1);}
+  }
+  #splash .splash-logo{
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600;
+    font-size:48px; color:var(--ink);
+    opacity:0; transform:scale(0.8);
+    animation:splashIn 1s ease forwards;
+    animation-delay:0.7s;
+  }
+  @keyframes splashIn{
+    0%{opacity:0; transform:scale(0.8) translateY(8px);}
+    60%{opacity:1; transform:scale(1.04) translateY(0);}
+    100%{opacity:1; transform:scale(1) translateY(0);}
+  }
+  #splash.hide{opacity:0; visibility:hidden;}
+
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:var(--surface);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:relative; flex-shrink:0;
+    transition:background .2s;
+  }
+  .icon-btn:hover{background:var(--line);}
+  .icon-btn svg{width:18px;height:18px; stroke:var(--ink);}
+  .header-icons{display:flex; align-items:center; gap:10px;}
+  .cart-count{
+    position:absolute; top:-4px; right:-4px;
+    background:var(--maroon); color:#fff;
+    font-size:10px; font-weight:600;
+    width:18px; height:18px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .greeting{font-size:13px; color:var(--ink-soft); margin-right:4px;}
+
+  .cart-btn{
+    position:absolute; top:10px; right:10px; z-index:3;
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(255,255,255,0.92); border:none;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .2s, transform .15s;
+  }
+  .cart-btn:hover{background:#fff; transform:scale(1.08);}
+  .cart-btn svg{width:16px;height:16px; stroke:var(--maroon);}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    display:none; align-items:center; justify-content:center;
+    z-index:200;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--surface); border-radius:16px;
+    width:340px; padding:28px; position:relative;
+  }
+  .modal-box .modal-close{position:absolute; top:14px; right:14px; cursor:pointer; font-size:18px; color:var(--ink-soft); background:none; border:none;}
+  .modal-tabs{display:flex; gap:18px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+  .modal-tabs button{
+    background:none; border:none; padding:8px 0; font-size:14px; font-weight:500;
+    color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent;
+  }
+  .modal-tabs button.active{color:var(--ink); border-color:var(--maroon);}
+  .modal-box h3{font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600; font-size:24px; margin-bottom:16px;}
+  .modal-box input{
+    width:100%; padding:11px 14px; margin-bottom:12px;
+    border:1px solid var(--line); border-radius:9px; background:var(--cream);
+    font-family:'Jost'; font-size:14px; color:var(--ink); outline:none;
+  }
+  .modal-box .submit-btn{
+    width:100%; padding:11px 0; border:none; border-radius:999px;
+    background:var(--maroon); color:#fff; font-size:14px; font-weight:500; cursor:pointer;
+  }
+  .modal-note{font-size:11px; color:var(--ink-soft); margin-top:10px; text-align:center;}
+
+  .cart-panel{
+    position:fixed; top:0; right:-380px; width:360px; height:100%;
+    background:var(--surface); box-shadow:-8px 0 24px rgba(0,0,0,0.12);
+    z-index:201; transition:right .3s ease; padding:24px; overflow-y:auto;
+  }
+  .cart-panel.open{right:0;}
+  .cart-panel h3{font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600; font-size:24px; margin-bottom:18px;}
+  .cart-panel .modal-close{position:absolute; top:20px; right:20px; cursor:pointer; font-size:18px; background:none; border:none; color:var(--ink-soft);}
+  .cart-item{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  .cart-item .remove{color:var(--maroon); cursor:pointer; font-size:12px; background:none; border:none;}
+  .cart-empty{color:var(--ink-soft); font-size:14px; margin-top:20px;}
+  .cart-total{display:flex; justify-content:space-between; font-weight:600; padding-top:16px; font-size:15px;}
+  .cart-note{font-size:12px; color:var(--ink-soft); margin-top:14px; line-height:1.6;}
+  .panel-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:199; display:none;}
+  .panel-backdrop.open{display:block;}
+  a{text-decoration:none;color:inherit;}
+  img{max-width:100%;display:block;}
+
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--cream);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar{
+    max-width:1200px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px;
+  }
+  .logo{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-weight:600;
+    font-size:34px;
+    color:var(--ink);
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);}
+  nav.categories{
+    display:flex; gap:28px;
+    font-size:14px; letter-spacing:0.03em;
+    font-weight:500;
+  }
+  nav.categories a{color:var(--ink-soft); transition:color .2s;}
+  nav.categories a:hover, nav.categories a.active{color:var(--maroon);}
+  .search-wrap{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:999px; padding:9px 16px;
+    min-width:220px;
+  }
+  .search-wrap input{border:none; outline:none; background:transparent; font-family:'Jost'; font-size:14px; width:100%; color:var(--ink);}
+  .icon{width:16px;height:16px; flex-shrink:0;}
+  .menu-toggle{display:none; background:none; border:none; cursor:pointer;}
+
+  .section{max-width:1200px; margin:0 auto; padding:48px 24px;}
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:18px;
+  }
+  .section-head h2{
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600;
+    font-size:30px; color:var(--ink);
+  }
+  .section-head .count{font-size:13px; color:var(--ink-soft);}
+
+  .grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:22px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    overflow:hidden; display:flex; flex-direction:column;
+    transition:box-shadow .25s, transform .25s;
+  }
+  .card:hover{box-shadow:0 12px 28px rgba(43,32,36,0.08); transform:translateY(-3px);}
+  .thumb{
+    aspect-ratio:3/4; background:#F1E9DC; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--line);
+  }
+  .thumb svg{width:42px;height:42px; stroke:var(--gold-deep); opacity:0.55;}
+  .thumb .replace-tag{
+    position:absolute; bottom:8px; left:8px; right:8px;
+    font-size:10px; letter-spacing:0.03em; color:var(--ink-soft);
+    background:rgba(255,255,255,0.85); border-radius:6px; padding:3px 6px;
+    text-align:center;
+  }
+  .badge-pick{
+    position:absolute; top:10px; left:10px;
+    background:var(--gold); color:#fff; font-size:10px; font-weight:600;
+    letter-spacing:0.04em; text-transform:uppercase;
+    padding:4px 9px; border-radius:999px;
+  }
+  .card-body{padding:16px; display:flex; flex-direction:column; gap:6px; flex:1;}
+  .card-body .name{font-size:14px; font-weight:500; color:var(--ink);}
+  .card-body .stars{font-size:12px; color:var(--gold-deep); letter-spacing:1px;}
+  .card-body .price{font-size:16px; font-weight:600; color:var(--ink); margin-top:2px;}
+  .card-body .price .old{font-size:12px; font-weight:400; color:var(--ink-soft); text-decoration:line-through; margin-left:6px;}
+  .shop-btn{
+    margin-top:auto; text-align:center;
+    border:1px solid var(--ink); border-radius:999px;
+    padding:9px 0; font-size:13px; font-weight:500;
+    transition:background .2s, color .2s;
+  }
+  .shop-btn:hover{background:var(--ink); color:#fff;}
+
+  .strip{
+    background:var(--ink); color:#fff;
+    margin:64px 0; padding:46px 24px;
+    text-align:center;
+  }
+  .strip-inner{max-width:640px; margin:0 auto;}
+  .strip h3{font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:600; font-size:26px; margin-bottom:10px;}
+  .strip p{font-size:14px; color:#D8CFC4;}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:40px 24px 28px;
+  }
+  .footer-inner{
+    max-width:1200px; margin:0 auto;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px;
+  }
+  .footer-brand .logo{font-size:26px; margin-bottom:8px;}
+  .footer-brand p{font-size:13px; color:var(--ink-soft); max-width:260px;}
+  .footer-links{display:flex; gap:40px; flex-wrap:wrap;}
+  .footer-links h4{font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:12px;}
+  .footer-links a{display:block; font-size:14px; color:var(--ink); margin-bottom:8px;}
+  .footer-bottom{
+    max-width:1200px; margin:28px auto 0; padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:12px; color:var(--ink-soft);
+  }
+
+  @media (max-width:980px){
+    nav.categories{display:none;}
+    .grid{grid-template-columns:repeat(2,1fr);}
+    .menu-toggle{display:block;}
+  }
+  @media (max-width:560px){
+    .topbar{padding:14px 18px;}
+    .search-wrap{min-width:0;}
+    .grid{grid-template-columns:repeat(2,1fr); gap:14px;}
+    .section{padding:36px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div style="text-align:center;">
+    <div class="splash-bunny">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="38" cy="22" rx="7" ry="20" transform="rotate(-15 38 22)" fill="#DDBEA9"/>
+        <ellipse cx="62" cy="22" rx="7" ry="20" transform="rotate(15 62 22)" fill="#DDBEA9"/>
+        <ellipse cx="38" cy="24" rx="3" ry="12" transform="rotate(-15 38 24)" fill="#F7EFE6"/>
+        <ellipse cx="62" cy="24" rx="3" ry="12" transform="rotate(15 62 24)" fill="#F7EFE6"/>
+        <ellipse cx="50" cy="83" rx="21" ry="15" fill="#DDBEA9"/>
+        <circle cx="50" cy="55" r="22" fill="#E8D2BE"/>
+        <circle cx="38" cy="61" r="3.4" fill="#F2C9B0" opacity="0.7"/>
+        <circle cx="62" cy="61" r="3.4" fill="#F2C9B0" opacity="0.7"/>
+        <circle cx="42.5" cy="52" r="2.3" fill="#3D2B1F"/>
+        <circle cx="57.5" cy="52" r="2.3" fill="#3D2B1F"/>
+        <ellipse cx="50" cy="59" rx="3" ry="2.2" fill="#CB997E"/>
+        <path d="M47 62 Q50 65 53 62" stroke="#3D2B1F" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="splash-logo">HerPick<span class="dot"></span></div>
+  </div>
+</div>
+
+<header>
+  <div class="topbar">
+    <a href="#" class="logo">HerPick<span class="dot"></span></a>
+    <nav class="categories" id="catNav">
+      <a href="#dresses" class="active">Dresses</a>
+      <a href="#ethnic">Ethnic wear</a>
+      <a href="#footwear">Footwear</a>
+      <a href="#accessories">Accessories</a>
+    </nav>
+    <div class="search-wrap">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#6E6469" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search styles...">
+    </div>
+    <div class="header-icons">
+      <span class="greeting" id="greeting" style="display:none;"></span>
+
+      <button class="icon-btn" id="themeToggle" title="Toggle dark mode">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      </button>
+      
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </button>
+
+      <button class="icon-btn" id="loginBtn" title="Login / Sign up">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+
+      <button class="icon-btn" id="cartBtn" title="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-count" id="cartCount" style="display:none;">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div style="height:28px;"></div>
+
+<!-- ============ DRESSES ============ -->
+<section class="section" id="dresses">
+  <div class="section-head">
+    <h2>Dresses</h2>
+    <span class="count">4 picks</span>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="thumb" style="background:none; padding:0;"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <span class="badge-pick" style="z-index:2;">Editor's pick</span>
+        <img src="https://placehold.co/300x400/DDBEA9/3D2B1F?text=Floral+A-Line+Dress&font=playfair-display" alt="Floral print A-line dress" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="card-body">
+        <div class="name">Floral print A-line dress</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹899 <span class="old">₹1,499</span></div>
+        <a href="https://www.amazon.in/s?k=floral+a-line+dress+women" target="_blank" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 4l3-2 3 2 2 5-3 1v10H7V10L4 9z"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Solid colour maxi dress</div>
+        <div class="stars">★★★★★</div>
+        <div class="price">₹1,199</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 4l3-2 3 2 2 5-3 1v10H7V10L4 9z"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Off-shoulder casual dress</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹749 <span class="old">₹999</span></div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 4l3-2 3 2 2 5-3 1v10H7V10L4 9z"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Printed wrap dress</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹1,049</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ ETHNIC WEAR ============ -->
+<section class="section" id="ethnic">
+  <div class="section-head">
+    <h2>Ethnic wear</h2>
+    <span class="count">4 picks</span>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <span class="badge-pick">Editor's pick</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 21V9l8-6 8 6v12"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Embroidered anarkali set</div>
+        <div class="stars">★★★★★</div>
+        <div class="price">₹1,899</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 21V9l8-6 8 6v12"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Banarasi silk saree</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹2,499 <span class="old">₹3,200</span></div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 21V9l8-6 8 6v12"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Cotton kurta with palazzo</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹1,099</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 21V9l8-6 8 6v12"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Printed dupatta set</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹699</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-inner">
+    <h3>New picks land every Monday</h3>
+    <p>We update the edit weekly so the recommendations always match the season.</p>
+  </div>
+</div>
+
+<!-- ============ FOOTWEAR ============ -->
+<section class="section" id="footwear">
+  <div class="section-head">
+    <h2>Footwear</h2>
+    <span class="count">4 picks</span>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M3 18h18M4 18v-3l4-3 3 1 4-4 4 2v7"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Block heel sandals</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹899</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb" style="background:none; padding:0;"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <img src="https://placehold.co/300x400/CB997E/FBF3EC?text=White+Sneakers&font=playfair-display" alt="Casual white sneakers" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="card-body">
+        <div class="name">Casual white sneakers</div>
+        <div class="stars">★★★★★</div>
+        <div class="price">₹1,299 <span class="old">₹1,799</span></div>
+        <a href="https://www.amazon.in/s?k=casual+white+sneakers+women" target="_blank" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M3 18h18M4 18v-3l4-3 3 1 4-4 4 2v7"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Embellished juttis</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹649</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M3 18h18M4 18v-3l4-3 3 1 4-4 4 2v7"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Strappy stiletto heels</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹1,599</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ ACCESSORIES ============ -->
+<section class="section" id="accessories">
+  <div class="section-head">
+    <h2>Accessories</h2>
+    <span class="count">4 picks</span>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <span class="badge-pick">Editor's pick</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Layered gold-tone necklace</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹549</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Structured tote bag</div>
+        <div class="stars">★★★★★</div>
+        <div class="price">₹1,399 <span class="old">₹1,899</span></div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Pearl drop earrings</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹399</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="thumb"><button class="cart-btn" onclick="addToCart(this)" title="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="replace-tag">Replace with product photo</span>
+      </div>
+      <div class="card-body">
+        <div class="name">Oversized sunglasses</div>
+        <div class="stars">★★★★☆</div>
+        <div class="price">₹699</div>
+        <a href="#" class="shop-btn">Shop now</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">HerPick<span class="dot"></span></div>
+      <p>Curated women's fashion picks. We may earn a commission on purchases made through links on this site, at no extra cost to you.</p>
+    </div>
+    <div class="footer-links">
+      <div>
+        <h4>Shop</h4>
+        <a href="#dresses">Dresses</a>
+        <a href="#ethnic">Ethnic wear</a>
+        <a href="#footwear">Footwear</a>
+        <a href="#accessories">Accessories</a>
+      </div>
+      <div>
+        <h4>Information</h4>
+        <a href="privacy-policy.html">Privacy policy</a>
+        <a href="affiliate-disclosure.html">Affiliate disclosure</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2026 HerPick. All rights reserved.
+  </div>
+</footer>
+
+<!-- ============ LOGIN MODAL ============ -->
+<div class="modal-overlay" id="loginOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="closeLogin">&times;</button>
+    <div class="modal-tabs">
+      <button id="tabLogin" class="active">Log in</button>
+      <button id="tabSignup">Sign up</button>
+    </div>
+    <h3 id="modalTitle">Welcome back</h3>
+    <form id="loginForm">
+      <input type="text" id="userName" placeholder="Your name" required>
+      <input type="email" placeholder="Email address" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit" class="submit-btn" id="submitBtn">Log in</button>
+    </form>
+    <p class="modal-note">This is a demo login — your details are only saved in this browser, not on a server.</p>
+  </div>
+</div>
+
+<!-- ============ CART PANEL ============ -->
+<div class="panel-backdrop" id="cartBackdrop"></div>
+<div class="cart-panel" id="cartPanel">
+  <button class="modal-close" id="closeCart">&times;</button>
+  <h3>Your picks</h3>
+  <div id="cartItems"></div>
+  <div class="cart-note">Items here are saved for you — click "Shop now" on the product to complete your purchase on the retailer's site.</div>
+</div>
+
+
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+    }, 2100);
+  });
+
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  function applyTheme(theme){
+    if(theme === 'dark'){ root.setAttribute('data-theme','dark'); }
+    else { root.removeAttribute('data-theme'); }
+    localStorage.setItem('herpick-theme', theme);
+  }
+  applyTheme(localStorage.getItem('herpick-theme') || 'light');
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+
+
+  const loginOverlay = document.getElementById('loginOverlay');
+  const loginBtn = document.getElementById('loginBtn');
+  const closeLogin = document.getElementById('closeLogin');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+  const modalTitle = document.getElementById('modalTitle');
+  const submitBtn = document.getElementById('submitBtn');
+  const greeting = document.getElementById('greeting');
+
+  function setMode(mode){
+    if(mode === 'signup'){
+      tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+      modalTitle.textContent = 'Create your account';
+      submitBtn.textContent = 'Sign up';
+    } else {
+      tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+      modalTitle.textContent = 'Welcome back';
+      submitBtn.textContent = 'Log in';
+    }
+  }
+  tabLogin.addEventListener('click', () => setMode('login'));
+  tabSignup.addEventListener('click', () => setMode('signup'));
+
+  function showGreeting(name){
+    greeting.textContent = 'Hi, ' + name;
+    greeting.style.display = 'inline';
+  }
+  const savedUser = localStorage.getItem('herpick-user');
+  if(savedUser) showGreeting(savedUser);
+
+  loginBtn.addEventListener('click', () => loginOverlay.classList.add('open'));
+  closeLogin.addEventListener('click', () => loginOverlay.classList.remove('open'));
+  loginOverlay.addEventListener('click', (e) => { if(e.target === loginOverlay) loginOverlay.classList.remove('open'); });
+
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('userName').value.trim() || 'there';
+    localStorage.setItem('herpick-user', name);
+    showGreeting(name);
+    loginOverlay.classList.remove('open');
+  });
+
+  const cartBtn = document.getElementById('cartBtn');
+  const cartPanel = document.getElementById('cartPanel');
+  const cartBackdrop = document.getElementById('cartBackdrop');
+  const closeCart = document.getElementById('closeCart');
+  const cartCount = document.getElementById('cartCount');
+  const cartItemsEl = document.getElementById('cartItems');
+
+  let cart = JSON.parse(localStorage.getItem('herpick-cart') || '[]');
+
+  function saveCart(){
+    localStorage.setItem('herpick-cart', JSON.stringify(cart));
+    renderCart();
+  }
+
+  function renderCart(){
+    cartCount.style.display = cart.length ? 'flex' : 'none';
+    cartCount.textContent = cart.length;
+    if(!cart.length){
+      cartItemsEl.innerHTML = '<p class="cart-empty">No items saved yet — tap the bag icon on any product to add it here.</p>';
+      return;
+    }
+    let total = 0;
+    cartItemsEl.innerHTML = cart.map((item, i) => {
+      total += item.price;
+      return `<div class="cart-item"><span>${item.name}</span><span>₹${item.price}&nbsp;&nbsp;<button class="remove" onclick="removeFromCart(${i})">remove</button></span></div>`;
+    }).join('') + `<div class="cart-total"><span>Total</span><span>₹${total}</span></div>`;
+  }
+
+  function addToCart(btn){
+    const card = btn.closest('.card');
+    const name = card.querySelector('.name').textContent;
+    const priceEl = card.querySelector('.price').cloneNode(true);
+    const oldEl = priceEl.querySelector('.old');
+    if(oldEl) oldEl.remove();
+    const price = parseInt(priceEl.textContent.replace(/[^0-9]/g, ''));
+    cart.push({name, price});
+    saveCart();
+    btn.style.background = 'var(--gold)';
+    setTimeout(() => btn.style.background = '', 400);
+  }
+
+  function removeFromCart(index){
+    cart.splice(index, 1);
+    saveCart();
+  }
+
+  cartBtn.addEventListener('click', () => { cartPanel.classList.add('open'); cartBackdrop.classList.add('open'); });
+  function closeCartPanel(){ cartPanel.classList.remove('open'); cartBackdrop.classList.remove('open'); }
+  closeCart.addEventListener('click', closeCartPanel);
+  cartBackdrop.addEventListener('click', closeCartPanel);
+
+  renderCart();
+
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('nav.categories a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+<!-- ===== HERPICK MUSIC PLAYER ===== -->
+
+<div class="music-btn" id="musicOpen">🎵</div>
+
+<div class="music-player" id="musicPlayer">
+
+    <div class="music-title" id="songTitle">
+        Select a Song
+    </div>
+
+    <audio id="audio"></audio>
+
+    <input type="range" id="progress" value="0" min="0" max="100">
+
+    <div class="music-controls">
+        <button id="prev">⏮</button>
+        <button id="play">▶</button>
+        <button id="next">⏭</button>
+    </div>
+
+    <input
+        type="range"
+        id="volume"
+        min="0"
+        max="1"
+        step="0.01"
+        value="1"
+    >
+
+    <div class="playlist" id="playlist"></div>
+
+</div>
+
+<link rel="stylesheet" href="music-player.css">
+<script src="music-player.js"></script>
+</body>
+</html>
